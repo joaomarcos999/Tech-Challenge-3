@@ -133,3 +133,30 @@ O projeto já inclui uma camada de anonimização pronta para dados com PII/PHI:
 - `src/external_pipeline.py` → coleta das fontes externas
 - `src/normalize_datasets.py` → normalização final
 - `config/sources.json` → configuração das fontes
+
+---
+
+## 🧠 Fine‑tuning com LLaMA (suporte à decisão clínica)
+
+### Visão geral
+- **Estratégia**: LoRA/QLoRA para reduzir custo e acelerar iterações
+- **Modelo**: LLaMA‑3 Instruct (ex.: `meta-llama/Meta-Llama-3-8B-Instruct`)
+- **Entrada**: `data/normalized/train_merged.jsonl`
+
+### Configuração
+Arquivo YAML padrão: `configs/llama_lora.yaml`
+
+### Treino
+```powershell
+& "C:/Program Files/Python313/python.exe" -m src.train_llama --config-path configs\llama_lora.yaml
+```
+
+### Treino no Google Colab (GPU gratuita)
+Guia completo em `colab_train.md`.
+
+### Saída
+- Pesos LoRA e tokenizer em `outputs/llama3-lora/`
+
+### Observações
+- Ajuste `max_seq_length` e `batch_size` conforme a GPU disponível.
+- Para ambientes sem `bf16`, ajuste `bf16` para `false` no código.
