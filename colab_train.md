@@ -25,6 +25,11 @@ drive.mount('/content/drive')
 !pip install -r requirements.txt
 ```
 
+Se aparecer erro de `triton` ou `bitsandbytes`, rode:
+```bash
+!pip install -U triton bitsandbytes
+```
+
 ## 5) Login no Hugging Face
 ```python
 from huggingface_hub import login

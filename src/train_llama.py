@@ -9,9 +9,11 @@ import argparse
 import yaml
 from datasets import load_dataset
 from peft import LoraConfig, get_peft_model
+import torch
 from transformers import (
     AutoModelForCausalLM,
     AutoTokenizer,
+    BitsAndBytesConfig,
     DataCollatorForLanguageModeling,
     Trainer,
     TrainingArguments,
@@ -133,9 +135,32 @@ def main(config_path: Path) -> None:
         else None
     )
 
+    use_bnb = False
+    if torch.cuda.is_available():
+        try:
+            import bitsandbytes  # noqa: F401
+            import triton  # noqa: F401
+
+            use_bnb = True
+        except Exception:
+            use_bnb = False
+
+    use_bf16 = torch.cuda.is_available() and torch.cuda.is_bf16_supported()
+    torch_dtype = torch.bfloat16 if use_bf16 else torch.float16
+
+    quant_config = None
+    if use_bnb:
+        quant_config = BitsAndBytesConfig(
+            load_in_4bit=True,
+            bnb_4bit_use_double_quant=True,
+            bnb_4bit_quant_type="nf4",
+            bnb_4bit_compute_dtype=torch_dtype,
+        )
+
     model = AutoModelForCausalLM.from_pretrained(
         config.model_name,
-        load_in_4bit=True,
+        quantization_config=quant_config,
+        torch_dtype=torch_dtype if torch.cuda.is_available() else None,
         device_map="auto",
     )
 
@@ -158,8 +183,8 @@ def main(config_path: Path) -> None:
         logging_steps=config.logging_steps,
         save_steps=config.save_steps,
         evaluation_strategy="steps" if eval_tokenized is not None else "no",
-        bf16=True,
-        fp16=False,
+        bf16=use_bf16,
+        fp16=torch.cuda.is_available() and not use_bf16,
         optim="paged_adamw_32bit",
         report_to="none",
     )
