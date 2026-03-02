@@ -1,0 +1,16 @@
+{
+  "conitec": {
+    "base_url": "https://www.gov.br/conitec/pt-br/assuntos/avaliacao-de-tecnologias-em-saude/protocolos-clinicos-e-diretrizes-terapeuticas",
+    "prefer_html": true,
+    "include_pdf": true,
+    "max_links": 200
+  },
+  "pubmedqa": {
+    "dataset_url": "https://pubmedqa.github.io/",
+    "notes": "Informe um link direto para o arquivo de dados (ex.: zip/json) se necessário."
+  },
+  "medquad": {
+    "repo_url": "https://github.com/abachaa/MedQuAD",
+    "notes": "Repositório com múltiplos arquivos; o pipeline pode clonar e extrair." 
+  }
+}
